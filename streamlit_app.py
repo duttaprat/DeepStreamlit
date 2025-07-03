@@ -88,16 +88,25 @@ try:
 
     with col1:
         try:
-            # Add top padding
-            st.write('<div style="height: {}px;"></div>'.format(top_padding), unsafe_allow_html=True)
-            df_json = pd.DataFrame(json_data).T
-            st.dataframe(df_json)
-            st.markdown("""
-            <div align="center">
-                <strong>Data Statistics for Predicted Candidate Variants in the {} Regions</strong><br>
-                <span>Including the count of associated DBSNP IDs and ClinVar annotations.</span>
-            </div>
-            """.format(analysis_type), unsafe_allow_html=True)
+            # --- Summary Statistics (Recreating Table 1) ---
+            st.header("Summary of Predicted Functional Variants in GBM")
+            st.markdown("This table summarizes the total number of variants analyzed and the subset predicted as functionally disruptive by DeepVRegulome, focusing on those present in >10% of the GBM patient cohort.")
+
+            # Data for the summary table - directly from your paper's Table 1
+            summary_data = {
+                "Fine-tuned Models": ["Splice Sites", "Splice Sites", "Splice Sites", "Splice Sites", "ChIP-seq Models", "ChIP-seq Models", "ChIP-seq Models", "ChIP-seq Models"],
+                "Subtype": ["Acceptor", "Acceptor", "Donor", "Donor", "Histone Markers", "Histone Markers", "TFs", "TFs"],
+                "Variant Type": ["SNVs", "Indels", "SNVs", "Indels", "SNVs", "Indels", "SNVs", "Indels"],
+                "Total Variants": [19968, 34718, 23656, 20171, 127297, 254566, 932133, 2130274],
+                "Total Regions": [14743, 19897, 15849, 13491, 57013, 87949, 358414, 533433],
+                "Predicted Functional Variants (>10% Samples)": ["299 (1)", "1,822 (437)", "673 (4)", "504 (130)", "387 (2)", "536 (150)", "19,709 (1,087)", "35,867 (8,598)"],
+                "Affected Regions (>10% Samples)": ["265 (3)", "1,375 (408)", "545 (4)", "423 (122)", "311 (5)", "373 (129)", "16,566 (322)", "30,411 (7,297)"]
+            }
+            summary_df = pd.DataFrame(summary_data)
+
+            # Display the dataframe with styling
+            st.dataframe(summary_df, use_container_width=True)
+
 
 
 

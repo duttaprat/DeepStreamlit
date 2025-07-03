@@ -75,6 +75,8 @@ try:
 
     with col2:
         try:
+            clinical_file_path = "data/Brain/patient_clinical_updated.tsv"
+            df_clinical = pd.read_csv(clinical_file_path, sep='\t')
             df_clinical = df_clinical[(df_clinical["project_id"] == "CPTAC-3") | (df_clinical["project_id"] == "TCGA-GBM")].reset_index(drop=True)
             total_patients = df_clinical.shape[0]
             df_clinical['total_patients'] = f'Total GBM Patients: <br> {total_patients}'

@@ -24,9 +24,7 @@ st.markdown("""
 st.title("🧬DeepVRegulome: DNABERT-based deep-learning framework for predicting the functional impact of short genomic variants on the human regulome")
 st.subheader("Welcome to the interactive data portal for **DeepVRegulome**, an interactive platform for exploring the functional impact of genomic variants.")
 
-st.markdown("""
-This portal is the official interactive companion to our under review *Nature Methods* publication on **DeepVRegulome**. It allows researchers to explore the data, models, and key findings from our study. 
-""")
+
 st.divider()
 # --- Introduction and User Guidance ---
 #col1, col2 = st.columns(2, gap="large")
@@ -35,6 +33,11 @@ col1, col2 = st.columns([4, 5], gap="large")
 with col1:
     st.markdown("""
     ### Your Gateway to Genomic Discovery
+    """)
+    st.markdown("""
+    This portal is the official interactive companion to our under review *Nature Methods* publication on **DeepVRegulome**. 
+
+     It is designed to help researchers explore our models, data, and key findings in an intuitive way.
     """)
     # This is the most important part: A clear call to action.
     st.success("To begin, please select the **'🏠 Overview'** page from the sidebar on the left.", icon="👈")

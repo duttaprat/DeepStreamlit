@@ -11,6 +11,14 @@ st.set_page_config(
     initial_sidebar_state="expanded" # Ensure the sidebar is open by default
 )
 
+st.markdown("""
+<style>
+    div[data-testid="stHorizontalBlock"] {
+        align-items: center;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 
 # Title of the app
 st.title("🧬DeepVRegulome: DNABERT-based deep-learning framework for predicting the functional impact of short genomic variants on the human regulome")

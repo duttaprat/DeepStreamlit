@@ -9,9 +9,10 @@ st.set_page_config(
     page_icon="🧬"
 )
 
-# --- Header and Introduction ---
-st.title("DeepVRegulome: A DNABERT-based Framework")
-st.subheader("Predicting the functional impact of short genomic variants on the human regulome")
+
+# Title of the app
+st.title("🧬DeepVRegulome: DNABERT-based deep-learning framework for predicting the functional impact of short genomic variants on the human regulome")
+
 
 st.markdown("""
 Welcome to the interactive data portal for **DeepVRegulome**, a deep-learning method for predicting and interpreting functionally disruptive variants in the human regulome. This framework combines over 700 fine-tuned DNABERT models with comprehensive analysis tools to prioritize clinically relevant non-coding mutations.
@@ -72,6 +73,99 @@ try:
     )
     sunburst_fig.update_layout(margin=dict(t=40, l=10, r=10, b=10))
     st.plotly_chart(sunburst_fig, use_container_width=True)
+
+
+
+    ######
+    # Calculate the required height to center the content
+    total_height = 600  # Example total height of the column
+    content_height = 300  # Approximate height of the content
+    top_padding = (total_height - content_height) // 2
+
+    col1, col2 = st.columns([5, 5])
+
+
+
+    with col1:
+        try:
+            # Add top padding
+            st.write('<div style="height: {}px;"></div>'.format(top_padding), unsafe_allow_html=True)
+            df_json = pd.DataFrame(json_data).T
+            st.dataframe(df_json)
+            st.markdown("""
+            <div align="center">
+                <strong>Data Statistics for Predicted Candidate Variants in the {} Regions</strong><br>
+                <span>Including the count of associated DBSNP IDs and ClinVar annotations.</span>
+            </div>
+            """.format(analysis_type), unsafe_allow_html=True)
+
+
+
+        except Exception as e:
+            st.error(f"Failed to load sunburst chart: {str(e)}")
+
+
+
+    with col2:
+        try:
+            df_clinical = df_clinical[(df_clinical["project_id"] == "CPTAC-3") | (df_clinical["project_id"] == "TCGA-GBM")].reset_index(drop=True)
+            total_patients = df_clinical.shape[0]
+            df_clinical['total_patients'] = f'Total GBM Patients: <br> {total_patients}'
+            # Replace None values in relevant columns
+            df_clinical['primary_diagnosis'] = df_clinical['primary_diagnosis'].fillna('Unknown')
+            df_clinical['disease_type'] = df_clinical['disease_type'].fillna('Unknown')
+
+            sunburst_fig = px.sunburst(
+                df_clinical,
+                path=['total_patients', 'project_id', 'gender', 'primary_diagnosis'],
+                color='project_id',
+                color_discrete_sequence=px.colors.qualitative.Set2
+            )
+            sunburst_fig.update_layout(
+                margin=dict(t=5, l=5, r=5, b=5),
+                #sunburstcolorway=px.colors.qualitative.Set2,
+                #sunburstcolorway=[ "#AB63FA",  "#00CC96",  "#FFA15A", "#EF553B", "#19D3F3","#636EFA"],
+                extendsunburstcolors=True,
+                font=dict(size=13, color="white")  # Increase font size here
+            )
+            
+            # print(px.colors.qualitative.Set2)
+            # # Print color assignments
+            # color_assignments = {proj_id: px.colors.qualitative.Set2[i % len(px.colors.qualitative.Set2)]
+            #                      for i, proj_id in enumerate(df_clinical['project_id'].unique())}
+            # print(color_assignments)
+
+            # Define hover templates
+            hover_templates = {
+                'total_patients': '<b>Total GBM Patients</b><br>Count: %{value}<extra></extra>',
+                'project_id': '<b>Project ID</b>: %{label}<br>Count: %{value}<extra></extra>',
+                'gender': '<b>Gender</b>: %{label}<br>Count: %{value}<extra></extra>',
+                'primary_diagnosis': '<b>Primary Diagnosis</b>: %{label}<br>Count: %{value}<extra></extra>'
+            }
+
+            # Apply hover templates to each trace based on level
+            for trace in sunburst_fig.data:
+                labels = trace['labels']
+                trace_hovertemplates = []
+                for label in labels:
+                    if label.startswith('Total GBM Patients'):
+                        trace_hovertemplates.append(hover_templates['total_patients'])
+                    elif label in df_clinical['project_id'].values:
+                        trace_hovertemplates.append(hover_templates['project_id'])
+                    elif label in df_clinical['gender'].values:
+                        trace_hovertemplates.append(hover_templates['gender'])
+                    elif label in df_clinical['primary_diagnosis'].values:
+                        trace_hovertemplates.append(hover_templates['primary_diagnosis'])
+                    else:
+                        trace_hovertemplates.append('<b>%{label}</b><br>Count: %{value}<extra></extra>')
+                trace.hovertemplate = trace_hovertemplates
+
+
+
+            st.plotly_chart(sunburst_fig, use_container_width=True)
+            st.markdown("<div style='text-align: center;'>Distribution Chart of the GBM cancer patients collected from GDC portal.</div>", unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error processing clinical data: {str(e)}")
 
 except FileNotFoundError:
     st.error("Could not find the clinical data file. Please ensure `data/Brain/patient_clinical_updated.tsv` is in your repository.")

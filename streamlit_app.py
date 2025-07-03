@@ -30,7 +30,7 @@ This portal is the official interactive companion to our under review *Nature Me
 st.divider()
 # --- Introduction and User Guidance ---
 #col1, col2 = st.columns(2, gap="large")
-col1, col2 = st.columns([6, 4], gap="large")
+col1, col2 = st.columns([4, 5], gap="large")
 
 with col1:
     st.markdown("""

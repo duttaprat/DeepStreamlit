@@ -1,2 +1,1 @@
-# DeepStreamlit
-modular
+# DeepVRegulome_streamlit

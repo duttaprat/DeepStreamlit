@@ -10,7 +10,7 @@ st.set_page_config(layout="wide", page_title="Browse Variants")
 
 st.title("📊 Browse All Variants")
 st.markdown("Use the sidebar to select the dataset. Then, select a single variant from the table below to generate its Kaplan-Meier survival plot.")
-st.info("ℹ️ The survival analysis is performed in real-time for the selected variant against the entire patient cohort.")
+st.info("ℹ️ The `GBM_patient_ids` column is used for survival analysis but is hidden from the table for data privacy.")
 st.divider()
 
 # --- Sidebar for selections ---
@@ -36,11 +36,9 @@ def load_browser_data(cancer, analysis, source):
     tsv_path = f"{base_path}{analysis_folder}/"
     
     try:
-        # We only need the main transcript info and the clinical data for this page
         df_transcript_info = pd.read_csv(f"{tsv_path}{source}_combined_{analysis_folder}_Variants_frequency_with_gene_information.tsv", sep="\t")
         df_clinical = pd.read_csv(f"{base_path}patient_clinical_updated.tsv", sep='\t')
         
-        # Pre-process clinical data once
         df_clinical = df_clinical.dropna(subset=['manifest_patient_id', 'km_time', 'km_status'])
         
         return df_transcript_info, df_clinical
@@ -105,7 +103,7 @@ df_info, df_clinical = load_browser_data(cancer_type, analysis_type, data_source
 if df_info is not None and df_clinical is not None:
     st.header("Variant Data Table")
     
-    # Add variant information column for display
+    # Ensure the variant_information column exists
     if 'variant_information' not in df_info.columns:
         df_info['variant_information'] = df_info.apply(
             lambda row: f"{row['chromosome']}:{row['variant_start_position']}:{row['ref_nucleotide']}>{row['alternative_nucleotide']}",
@@ -118,6 +116,12 @@ if df_info is not None and df_clinical is not None:
     gb.configure_selection('single', use_checkbox=True, suppressRowDeselection=False)
     gb.configure_side_bar()
     grid_options = gb.build()
+
+    # --- HIDE PATIENT ID COLUMN ---
+    # This is the new logic. We remove the column definition for 'GBM_patient_ids'
+    # so it doesn't get rendered in the grid, but the data remains in the source dataframe.
+    column_defs = grid_options['columnDefs']
+    grid_options['columnDefs'] = [col for col in column_defs if col['field'] != 'GBM_patient_ids']
 
     grid_response = AgGrid(
         df_info,
@@ -133,20 +137,18 @@ if df_info is not None and df_clinical is not None:
     selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 
     # --- Survival Plot Generation ---
-    # CORRECTED LINE: Check if the DataFrame is not empty
     if not selected_rows_df.empty:
         st.divider()
         st.subheader("Kaplan-Meier Survival Plot")
         
-        # Get data for the single selected variant
         selected_variant_info = selected_rows_df.iloc[0]
         variant_id = selected_variant_info.get('variant_information', 'Unknown Variant')
+        # The 'GBM_patient_ids' column is still available here from the original df_info
         patient_ids_str = selected_variant_info.get('GBM_patient_ids', '')
         
         if not patient_ids_str:
             st.warning("The selected variant does not have associated patient IDs.")
         else:
-            # Create patient groups
             mutated_patient_ids = [pid.strip().split('_')[0] for pid in patient_ids_str.split(',')]
             df_clinical['group'] = df_clinical['manifest_patient_id'].apply(
                 lambda x: 'Mutated' if x in mutated_patient_ids else 'Wild-Type'
@@ -155,7 +157,6 @@ if df_info is not None and df_clinical is not None:
             group_A = df_clinical[df_clinical['group'] == 'Wild-Type']
             group_B = df_clinical[df_clinical['group'] == 'Mutated']
             
-            # Perform log-rank test and plot if both groups have data
             if not group_A.empty and not group_B.empty:
                 results = logrank_test(
                     group_A['km_time'], group_B['km_time'], 

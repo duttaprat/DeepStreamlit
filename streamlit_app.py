@@ -82,14 +82,13 @@ try:
     content_height = 300  # Approximate height of the content
     top_padding = (total_height - content_height) // 2
 
-    col1, col2 = st.columns([5, 5])
+    col1, col2 = st.columns([6, 4])
 
 
 
     with col1:
         try:
             # --- Summary Statistics (Recreating Table 1) ---
-            st.header("Summary of Predicted Functional Variants in GBM")
             st.markdown("This table summarizes the total number of variants analyzed and the subset predicted as functionally disruptive by DeepVRegulome, focusing on those present in >10% of the GBM patient cohort.")
 
             # Data for the summary table - directly from your paper's Table 1

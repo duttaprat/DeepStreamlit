@@ -106,10 +106,11 @@ if df_info is not None and df_clinical is not None:
     st.header("Variant Data Table")
     
     # Add variant information column for display
-    df_info['variant_information'] = df_info.apply(
-        lambda row: f"{row['chromosome']}:{row['variant_start_position']}:{row['ref_nucleotide']}>{row['alternative_nucleotide']}",
-        axis=1
-    )
+    if 'variant_information' not in df_info.columns:
+        df_info['variant_information'] = df_info.apply(
+            lambda row: f"{row['chromosome']}:{row['variant_start_position']}:{row['ref_nucleotide']}>{row['alternative_nucleotide']}",
+            axis=1
+        )
 
     # Configure the AG-Grid
     gb = GridOptionsBuilder.from_dataframe(df_info)
@@ -129,15 +130,16 @@ if df_info is not None and df_clinical is not None:
         allow_unsafe_jscode=True,
     )
     
-    selected_rows = grid_response['selected_rows']
+    selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 
     # --- Survival Plot Generation ---
-    if selected_rows:
+    # CORRECTED LINE: Check if the DataFrame is not empty
+    if not selected_rows_df.empty:
         st.divider()
         st.subheader("Kaplan-Meier Survival Plot")
         
         # Get data for the single selected variant
-        selected_variant_info = pd.DataFrame(selected_rows).iloc[0]
+        selected_variant_info = selected_rows_df.iloc[0]
         variant_id = selected_variant_info.get('variant_information', 'Unknown Variant')
         patient_ids_str = selected_variant_info.get('GBM_patient_ids', '')
         

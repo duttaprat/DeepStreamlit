@@ -19,9 +19,10 @@ st.subheader("Welcome to the interactive data portal for **DeepVRegulome**, an i
 st.markdown("""
 This portal is the official interactive companion to our under review *Nature Methods* publication on **DeepVRegulome**. It allows researchers to explore the data, models, and key findings from our study. 
 """)
-
+st.divider()
 # --- Introduction and User Guidance ---
-col1, col2 = st.columns(2, gap="large")
+#col1, col2 = st.columns(2, gap="large")
+col1, col2 = st.columns([6, 4], gap="large")
 
 with col1:
     st.markdown("""

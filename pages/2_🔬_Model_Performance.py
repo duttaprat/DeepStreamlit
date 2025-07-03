@@ -70,40 +70,40 @@ if df_accuracy is not None:
     
     st.divider()
 
-    # --- Section 2: ROC Curves (Recreating Figure 2c/d) ---
-    st.header("ROC Curves for Top Performing Models")
-    st.markdown("The Receiver Operating Characteristic (ROC) curves for the top-performing models demonstrate excellent discriminative ability, with Area Under the Curve (AUC) values approaching 1.0.")
+    # # --- Section 2: ROC Curves (Recreating Figure 2c/d) ---
+    # st.header("ROC Curves for Top Performing Models")
+    # st.markdown("The Receiver Operating Characteristic (ROC) curves for the top-performing models demonstrate excellent discriminative ability, with Area Under the Curve (AUC) values approaching 1.0.")
 
-    # Select top 10 models based on AUC for visualization
-    top_models = df_accuracy.nlargest(10, 'eval_auc')
+    # # Select top 10 models based on AUC for visualization
+    # top_models = df_accuracy.nlargest(10, 'eval_auc')
 
-    fig_roc = go.Figure()
-    fig_roc.add_shape(type='line', line=dict(dash='dash', color='grey'), x0=0, x1=1, y0=0, y1=1)
+    # fig_roc = go.Figure()
+    # fig_roc.add_shape(type='line', line=dict(dash='dash', color='grey'), x0=0, x1=1, y0=0, y1=1)
 
-    for index, row in top_models.iterrows():
-        # We generate a representative curve shape, as we don't have the raw TPR/FPR points.
-        # The AUC value, however, is the real data from your file.
-        false_positive_rates = [0, 0.01, 0.05, 0.1, 0.2, 0.5, 1]
-        # Create a curve that visually corresponds to the high AUC
-        true_positive_rates = [0, 0.80, 0.95, 0.98, 0.99, 1.0, 1.0]
-        fig_roc.add_trace(go.Scatter(
-            x=false_positive_rates, y=true_positive_rates, 
-            name=f"{row['tags']} (AUC={row['eval_auc']:.3f})", 
-            mode='lines',
-            hovertemplate='FPR: %{x:.3f}<br>TPR: %{y:.3f}'
-        ))
+    # for index, row in top_models.iterrows():
+    #     # We generate a representative curve shape, as we don't have the raw TPR/FPR points.
+    #     # The AUC value, however, is the real data from your file.
+    #     false_positive_rates = [0, 0.01, 0.05, 0.1, 0.2, 0.5, 1]
+    #     # Create a curve that visually corresponds to the high AUC
+    #     true_positive_rates = [0, 0.80, 0.95, 0.98, 0.99, 1.0, 1.0]
+    #     fig_roc.add_trace(go.Scatter(
+    #         x=false_positive_rates, y=true_positive_rates, 
+    #         name=f"{row['tags']} (AUC={row['eval_auc']:.3f})", 
+    #         mode='lines',
+    #         hovertemplate='FPR: %{x:.3f}<br>TPR: %{y:.3f}'
+    #     ))
 
-    fig_roc.update_layout(
-        title='ROC Curves for Top 10 Performing TFBS Models',
-        xaxis_title='False Positive Rate',
-        yaxis_title='True Positive Rate',
-        yaxis=dict(scaleanchor="x", scaleratio=1),
-        xaxis=dict(constrain='domain'),
-        legend_title="TFBS Model"
-    )
-    st.plotly_chart(fig_roc, use_container_width=True)
+    # fig_roc.update_layout(
+    #     title='ROC Curves for Top 10 Performing TFBS Models',
+    #     xaxis_title='False Positive Rate',
+    #     yaxis_title='True Positive Rate',
+    #     yaxis=dict(scaleanchor="x", scaleratio=1),
+    #     xaxis=dict(constrain='domain'),
+    #     legend_title="TFBS Model"
+    # )
+    # st.plotly_chart(fig_roc, use_container_width=True)
 
-    st.divider()
+    # st.divider()
 
     # --- Section 3: Splice Site Model Performance (Recreating Figure 2g) ---
     st.header("Performance of Splice Site Models")

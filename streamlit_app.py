@@ -59,7 +59,7 @@ with col2:
     st.header("Framework Architecture")
     try:
         # Make sure you have an image of Figure 1 from your paper in an 'assets' folder
-        image = Image.open("assets/architecture.png")
+        image = Image.open("assets/Figure1_architecture.png")
         st.image(image, caption="Architecture of the DeepVRegulome computational framework.", use_column_width=True)
     except FileNotFoundError:
         st.error("Architecture image not found. Please add 'Figure1_architecture.png' to an 'assets' folder in your repository.")

@@ -10,23 +10,12 @@ st.set_page_config(
 )
 
 
-# Title of the app
-st.title("🧬DeepVRegulome: DNABERT-based deep-learning framework for predicting the functional impact of short genomic variants on the human regulome")
-
-
-st.markdown("""
-Welcome to the interactive data portal for **DeepVRegulome**, a deep-learning method for predicting and interpreting functionally disruptive variants in the human regulome. This framework combines over 700 fine-tuned DNABERT models with comprehensive analysis tools to prioritize clinically relevant non-coding mutations.
-
-This portal allows you to explore the data and key findings from our study on the TCGA glioblastoma (GBM) cohort.
-
-**Navigate through the pages in the sidebar to:**
-- **Model Performance:** Evaluate the accuracy and predictive power of our underlying models.
-- **Browse All Variants:** Interactively filter and explore the complete dataset of predicted functional variants.
-- **Key Discoveries in GBM:** View the specific, survival-associated variants highlighted in our paper.
-- **Motif Validation:** See how our models learned biologically meaningful transcription factor binding motifs.
-""")
-
+# --- Header ---
+st.title("🏠 DeepVRegulome Overview")
+st.subheader("A DNABERT-based framework for predicting the functional impact of genomic variants on the human regulome")
 st.divider()
+
+
 
 
 

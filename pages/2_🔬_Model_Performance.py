@@ -50,8 +50,47 @@ def load_and_process_accuracy_data():
 df_accuracy = load_and_process_accuracy_data()
 
 if df_accuracy is not None:
-    # --- Section 1: Detailed Performance Metrics Boxplot (Recreating Figure 2a) ---
-    st.header("Performance Metrics by Model Type")
+    # --- Section 1: Model Type Distribution ---
+    st.header("Distribution of High-Confidence Models")
+    
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        model_type_counts = df_accuracy['Type'].value_counts().reset_index()
+        model_type_counts.columns = ['Type', 'Count']
+        
+        fig_pie = px.pie(
+            model_type_counts,
+            names='Type',
+            values='Count',
+            title="Model Distribution by Type",
+            hole=.3,
+            color_discrete_map={
+                'TF': 'rgba(100, 149, 237, 0.9)',
+                'TF; RBP': 'rgba(60, 179, 113, 0.9)',
+                'Histone': 'rgba(255, 99, 71, 0.9)'
+            }
+        )
+        fig_pie.update_traces(textinfo='percent+label', pull=[0.05, 0.05, 0.05])
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    with col2:
+        st.markdown("#### Breakdown of Analyzed Models")
+        st.markdown(f"""
+        Our analysis is based on **{len(df_accuracy)}** high-confidence models (Accuracy > 85%) fine-tuned on ENCODE data. The pie chart shows the distribution of these models:
+
+        - **Transcription Factors (TF):** The majority of models, representing sequence-specific DNA binding proteins.
+        - **RNA-Binding Proteins (TF; RBP):** A subset of TFs that are also known to bind RNA, playing dual roles in gene regulation.
+        - **Histone Marks:** Models trained on regions with specific histone modifications, which are often associated with broader regulatory domains.
+
+        This distribution provides context for the performance metrics shown in the box plot below.
+        """)
+    
+    st.divider()
+
+
+
+    # --- Section 2: Detailed Performance Metrics Boxplot (Recreating Figure 2a) ---
+    st.header("Performance Metrics of top TFBS Models by Model Type")
     st.markdown("The boxplots below compare key evaluation metrics across Transcription Factor (TF), RNA-Binding Protein (RBP), and Histone Mark models, demonstrating consistently high performance.")
     
     # Melt the dataframe to plot all metrics in one chart
@@ -76,12 +115,20 @@ if df_accuracy is not None:
             'Histone': 'rgba(255, 99, 71, 0.8)'     # Tomato
         },
         title="Comparison of Evaluation Metrics Between Model Types",
-        labels={"Value": "Metric Value", "Metric": "Evaluation Metric"}
+        labels={"Value": "Metric Value (%)", "Metric": "Evaluation Metric"}
     )
+    # --- UPDATED LAYOUT ---
     fig_box.update_layout(
+        height=600,  # Increased height of the plot
         legend_title_text='Model Type',
-        font=dict(size=20)
+        font=dict(size=16),  # Increased font size for better readability
+        title_font=dict(size=20),
+        xaxis=dict(title_font=dict(size=18)),
+        yaxis=dict(title_font=dict(size=18))
     )
+    # The y-axis values are already scaled from 0-1, so we display them as percentages
+    fig_box.update_yaxes(tickformat=".0%")
+    
     st.plotly_chart(fig_box, use_container_width=True)
     
     st.divider()

@@ -127,7 +127,7 @@ if df_accuracy is not None:
         yaxis=dict(title_font=dict(size=18))
     )
     # The y-axis values are already scaled from 0-1, so we display them as percentages
-    fig_box.update_yaxes(tickformat=".0%")
+    #fig_box.update_yaxes(tickformat=".0%")
     
     st.plotly_chart(fig_box, use_container_width=True)
     
@@ -168,40 +168,45 @@ if df_accuracy is not None:
 
     # st.divider()
 
-    # --- Section 3: Splice Site Model Performance (Recreating Figure 2g) ---
+    # --- NEW: Section 3: Splice Site Model Performance ---
     st.header("Performance of Splice Site Models")
     st.markdown("The radar plot below compares the performance of the separate classifiers trained to recognize donor and acceptor splice sites, showing a robust balance across all metrics.")
     
-    # Data taken from your paper for the radar plot
-    splice_data = {
-        'Metric': ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'MCC'],
-        'Donor': [94, 95, 93, 0.94, 0.89],
-        'Acceptor': [96, 96, 95, 0.96, 0.92]
-    }
-    df_splice = pd.DataFrame(splice_data)
+    # Data for the radar plot from your script
+    labels = ["Accuracy", "Precision", "Recall", "F1 Score", "MCC"]
+    acceptor_values = [0.9316, 0.9314, 0.9339, 0.9326, 0.8639]
+    donor_values = [0.9471, 0.9454, 0.9479, 0.9466, 0.8949]
 
     fig_radar = go.Figure()
+
+    # Donor Trace
     fig_radar.add_trace(go.Scatterpolar(
-        r=df_splice['Donor'],
-        theta=df_splice['Metric'],
+        r=donor_values,
+        theta=labels,
         fill='toself',
-        name='Donor Site Model'
+        name='Donor Site Model',
+        line=dict(color="#1f77b4"),
+        fillcolor='rgba(31, 119, 180, 0.2)'
     ))
+    # Acceptor Trace
     fig_radar.add_trace(go.Scatterpolar(
-        r=df_splice['Acceptor'],
-        theta=df_splice['Metric'],
+        r=acceptor_values,
+        theta=labels,
         fill='toself',
-        name='Acceptor Site Model'
+        name='Acceptor Site Model',
+        line=dict(color="#ff7f0e"),
+        fillcolor='rgba(255, 127, 14, 0.2)'
     ))
 
     fig_radar.update_layout(
       polar=dict(
         radialaxis=dict(
           visible=True,
-          range=[85, 100] # Adjust range to zoom in on the high performance
+          range=[0.85, 0.96] # Set range to zoom in on performance
         )),
       showlegend=True,
-      title="Performance Comparison: Donor vs. Acceptor Splice Site Models"
+      title="Comparison of Donor and Acceptor Splice Site Prediction",
+      font=dict(size=14)
     )
     st.plotly_chart(fig_radar, use_container_width=True)
 

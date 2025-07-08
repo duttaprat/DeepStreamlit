@@ -184,7 +184,7 @@ if df_accuracy is not None:
     # Donor Trace
     fig_radar.add_trace(go.Scatterpolar(
         r=donor_values_closed,
-        theta=labels_closed,
+        theta=labels,
         fill='toself',
         name='Donor Site Model',
         line=dict(color="#1f77b4"),
@@ -193,7 +193,7 @@ if df_accuracy is not None:
     # Acceptor Trace
     fig_radar.add_trace(go.Scatterpolar(
         r=acceptor_values_closed,
-        theta=labels_closed,
+        theta=labels,
         fill='toself',
         name='Acceptor Site Model',
         line=dict(color="#ff7f0e"),

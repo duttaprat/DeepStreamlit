@@ -53,7 +53,7 @@ if df_accuracy is not None:
     # --- Section 1: Model Type Distribution ---
     st.header("Distribution of High-Confidence Models")
     
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([1, 2], gap="large") # The alignment CSS will apply to these columns
     with col1:
         model_type_counts = df_accuracy['Type'].value_counts().reset_index()
         model_type_counts.columns = ['Type', 'Count']

@@ -36,6 +36,7 @@ try:
 
     with col1:
         try:
+            st.write('<div style="height: {}px;"></div>'.format(top_padding), unsafe_allow_html=True)
             # --- Summary Statistics (Recreating Table 1) ---
             st.markdown("This table summarizes the total number of variants analyzed and the subset predicted as functionally disruptive by DeepVRegulome, focusing on those present in >10% of the GBM patient cohort.")
 

@@ -121,7 +121,7 @@ if df_accuracy is not None:
     fig_box.update_layout(
         height=600,  # Increased height of the plot
         legend_title_text='Model Type',
-        font=dict(size=16),  # Increased font size for better readability
+        font=dict(size=20),  # Increased font size for better readability
         title_font=dict(size=20),
         xaxis=dict(title_font=dict(size=18)),
         yaxis=dict(title_font=dict(size=18))

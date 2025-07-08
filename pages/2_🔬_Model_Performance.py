@@ -57,7 +57,7 @@ if df_accuracy is not None:
     # Melt the dataframe to plot all metrics in one chart
     metrics_to_plot = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC', 'ROC-AUC']
     df_melted = df_accuracy.melt(
-        id_vars=['tags', 'Type'], 
+        id_vars=['TFBS', 'Type'], 
         value_vars=metrics_to_plot,
         var_name='Metric', 
         value_name='Value'

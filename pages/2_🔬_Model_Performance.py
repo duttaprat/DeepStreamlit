@@ -57,12 +57,11 @@ if df_accuracy is not None:
     with col1:
         model_type_counts = df_accuracy['Type'].value_counts().reset_index()
         model_type_counts.columns = ['Type', 'Count']
-        
+        st.markdown("#### Model Distribution by Type")
         fig_pie = px.pie(
             model_type_counts,
             names='Type',
             values='Count',
-            title="Model Distribution by Type",
             hole=.3,
             color_discrete_map={
                 'TF': 'rgba(100, 149, 237, 0.9)',
@@ -74,6 +73,7 @@ if df_accuracy is not None:
         st.plotly_chart(fig_pie, use_container_width=True)
 
     with col2:
+        st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("#### Breakdown of Analyzed Models")
         st.markdown(f"""
         Our analysis is based on **{len(df_accuracy)}** high-confidence models (Accuracy > 85%) fine-tuned on ENCODE data. The pie chart shows the distribution of these models:

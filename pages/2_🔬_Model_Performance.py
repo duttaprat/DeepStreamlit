@@ -168,17 +168,14 @@ if df_accuracy is not None:
 
     # st.divider()
 
-    # --- Section 3: Splice Site Model Performance ---
+    # --- NEW: Section 3: Splice Site Model Performance ---
     st.header("Performance of Splice Site Models")
     st.markdown("The radar plot below compares the performance of the separate classifiers trained to recognize donor and acceptor splice sites, showing a robust balance across all metrics.")
     
-    # Data for the radar plot
+    # Data for the radar plot from your script
     labels = ["Accuracy", "Precision", "Recall", "F1 Score", "MCC"]
     acceptor_values = [0.9316, 0.9314, 0.9339, 0.9326, 0.8639]
     donor_values = [0.9471, 0.9454, 0.9479, 0.9466, 0.8949]
-
-    # --- NEW: Manually wrap the data to close the polygon line ---
-    labels_closed = labels + [labels[0]]
     acceptor_values_closed = acceptor_values + [acceptor_values[0]]
     donor_values_closed = donor_values + [donor_values[0]]
 
@@ -207,7 +204,7 @@ if df_accuracy is not None:
       polar=dict(
         radialaxis=dict(
           visible=True,
-          range=[0.85, 0.96]
+          range=[0.85, 0.96] # Set range to zoom in on performance
         )),
       showlegend=True,
       title="Comparison of Donor and Acceptor Splice Site Prediction",

@@ -176,6 +176,7 @@ if df_accuracy is not None:
     labels = ["Accuracy", "Precision", "Recall", "F1 Score", "MCC"]
     acceptor_values = [0.9316, 0.9314, 0.9339, 0.9326, 0.8639]
     donor_values = [0.9471, 0.9454, 0.9479, 0.9466, 0.8949]
+    labels_closed = labels + [labels[0]]
     acceptor_values_closed = acceptor_values + [acceptor_values[0]]
     donor_values_closed = donor_values + [donor_values[0]]
 

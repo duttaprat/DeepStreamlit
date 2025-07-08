@@ -53,7 +53,7 @@ if df_accuracy is not None:
     # --- Section 1: Detailed Performance Metrics Boxplot (Recreating Figure 2a) ---
     st.header("Performance Metrics by Model Type")
     st.markdown("The boxplots below compare key evaluation metrics across Transcription Factor (TF), RNA-Binding Protein (RBP), and Histone Mark models, demonstrating consistently high performance.")
-    st.dataframe(df_accuracy)
+    
     # Melt the dataframe to plot all metrics in one chart
     metrics_to_plot = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC', 'ROC-AUC']
     df_melted = df_accuracy.melt(
@@ -80,7 +80,7 @@ if df_accuracy is not None:
     )
     fig_box.update_layout(
         legend_title_text='Model Type',
-        font=dict(size=12)
+        font=dict(size=20)
     )
     st.plotly_chart(fig_box, use_container_width=True)
     

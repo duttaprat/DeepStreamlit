@@ -78,7 +78,7 @@ def plot_tfbs_performance_bars(model_metrics):
                    'F1-score', 'MCC' (values between 0 and 100).
     """
     # 1) Prepare labels + raw values
-    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
+    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC', "ROC-AUC"]
     values = [float(model_metrics.get(m, 0)) for m in labels]
     
     # 2) Build the bar chart
@@ -92,11 +92,10 @@ def plot_tfbs_performance_bars(model_metrics):
     
     # 3) Layout tweaks: fixed y-axis from 0 to 100
     fig.update_layout(
-        title_text="Model Performance Metrics (%)",
         font=dict(size=20)
     )
     fig.update_xaxes(title_text="Metric")
-    fig.update_yaxes(title_text="Score", range=[70, 100])
+    fig.update_yaxes(title_text="Score(%)", range=[70, 100])
     
     return fig
 

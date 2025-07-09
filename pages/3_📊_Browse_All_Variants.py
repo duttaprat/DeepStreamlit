@@ -141,7 +141,6 @@ if analysis_type == "Splice Sites":
 # ==============================================================================
 elif analysis_type == "TFBS Models":
     st.header("TFBS Variant Analysis")
-    st.dataframe(df_variants)
 
     # --- Filter Controls ---
     tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_variants['TFBS'].unique()))

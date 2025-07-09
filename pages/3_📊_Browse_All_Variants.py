@@ -71,33 +71,49 @@ def plot_km_curve(group_A, group_B, variant_id, p_value):
     return fig
 
 def plot_tfbs_performance_bars(model_metrics):
-    # same labels/values as before
+    """
+    Plots a pastel Set2 bar chart of TFBS model performance.
+    Automatically rescales values >1 as percentages (÷100) and
+    sets a dynamic y-axis with 10% padding.
+    
+    model_metrics: dict with keys 'Accuracy', 'Precision', 'Recall',
+                   'F1-score', 'MCC' (values can be 0–1 or 0–100).
+    """
+    # 1) Prepare labels + raw values
     labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
-    values = [model_metrics.get(metric, 0) for metric in labels]
-    st.write(values)
-    # grab a pastel palette
-    colors = px.colors.qualitative.Set2[:len(labels)]
-
-    # build bar chart
+    raw_vals = [model_metrics.get(m, 0) for m in labels]
+    
+    # 2) Ensure floats
+    values = [float(v) for v in raw_vals]
+    
+    # 3) Auto‐convert percentages → fractions
+    if max(values, default=0) > 1.0:
+        values = [v / 100.0 for v in values]
+    
+    # 4) Compute dynamic y‐range (10% padding), clamp to [0,1]
+    if values:
+        lo = max(0.0, min(values) * 0.90)
+        hi = min(1.0, max(values) * 1.10)
+    else:
+        lo, hi = 0.0, 1.0
+    
+    # 5) Build the bar chart
+    colors = px.colors.qualitative.Set2[: len(labels)]
     fig = go.Figure(go.Bar(
         x=labels,
         y=values,
         marker_color=colors,
         showlegend=False
     ))
-
-    # layout tweaks: pastel bars, y-axis from 0 to 1, font size 20
+    
+    # 6) Layout tweaks
     fig.update_layout(
-        title="Model Performance Metrics",
-        xaxis_title="Metric",
-        yaxis_title="Value",
-        yaxis=dict(
-            range=[0.7, 1.0],
-            dtick=0.05
-        ),
+        title_text="Model Performance Metrics",
         font=dict(size=20)
     )
-
+    fig.update_xaxes(title_text="Metric")
+    fig.update_yaxes(title_text="Value", range=[lo, hi])
+    
     return fig
 
 

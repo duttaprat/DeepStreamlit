@@ -71,13 +71,32 @@ def plot_km_curve(group_A, group_B, variant_id, p_value):
     return fig
 
 def plot_tfbs_performance_radar(model_metrics):
-    # (Same as Model Performance page, but for a single model)
+    # same labels/values as before
     labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
     values = [model_metrics.get(metric, 0) for metric in labels]
-    fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=values, theta=labels, fill='toself', name='Performance', line=dict(color='dodgerblue')))
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 1])), showlegend=False, title="Model Performance Metrics", font=dict(size=12))
+
+    # grab a pastel palette
+    colors = px.colors.qualitative.Set2[:len(labels)]
+
+    # build bar chart
+    fig = go.Figure(go.Bar(
+        x=labels,
+        y=values,
+        marker_color=colors,
+        showlegend=False
+    ))
+
+    # layout tweaks: pastel bars, y-axis from 0 to 1, font size 20
+    fig.update_layout(
+        title="Model Performance Metrics",
+        xaxis_title="Metric",
+        yaxis_title="Value",
+        yaxis=dict(range=[0, 1]),
+        font=dict(size=20)
+    )
+
     return fig
+
 
 # --- Main Page Logic ---
 st.title("📊 Browse and Analyze Variants")
@@ -111,14 +130,26 @@ elif analysis_type == "TFBS Models":
 
     # --- TFBS Dashboard Section ---
     if df_tfbs_summary is not None:
-        model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model]
-        st.dataframe(model_summary)
+        model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
         
         st.subheader(f"Dashboard for: {tfbs_model}")
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Variants Found", f"{model_summary.get('Total_SNVs', 0) + model_summary.get('Total_Indels', 0)}")
-        col2.metric("JASPAR Match", f"{model_summary.get('JASPAR_Match_Type', 'N/A')}")
-        col3.metric("JASPAR ID", f"{model_summary.get('JASPAR_ID', 'N/A')}")
+        col1, col2, col3 = st.columns([1, 1, 2])
+        # first column: overall counts
+        with col1:
+            total = model_summary.get('Total_SNVs', 0) + model_summary.get('Total_Indels', 0)
+            st.metric("Total Variants Found", f"{total}")
+
+        # second column: JASPAR info
+        with col2:
+            st.metric("JASPAR Match Type", model_summary.get('JASPAR_Match_Type', 'N/A'))
+            st.metric("JASPAR ID", model_summary.get('JASPAR_ID', 'N/A'))
+
+        # third column: performance bar plot
+        with col3:
+            st.markdown("**Performance Metrics**")
+            st.metric("**Performance Metrics**")
+            barplot_fig = plot_tfbs_performance_bars(model_summary)
+            st.plotly_chart(barplot_fig, use_container_width=True)
         
         with st.expander("Show Model Performance Radar Chart"):
             radar_fig = plot_tfbs_performance_radar(model_summary)

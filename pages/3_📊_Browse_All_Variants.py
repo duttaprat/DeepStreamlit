@@ -108,7 +108,6 @@ def plot_tfbs_performance_bars(model_metrics):
     
     # 6) Layout tweaks
     fig.update_layout(
-        title_text="Model Performance Metrics",
         font=dict(size=20)
     )
     fig.update_xaxes(title_text="Metric")
@@ -155,7 +154,7 @@ elif analysis_type == "TFBS Models":
         col1, col2, col3 = st.columns([1, 1, 2])
         # first column: overall counts
         with col1:
-            total = model_summary.get('Total_SNVs', 0) + model_summary.get('Total_Indels', 0)
+            total = len(df_filtered)
             st.metric("Total Variants Found", f"{total}")
 
         # second column: JASPAR info
@@ -166,14 +165,10 @@ elif analysis_type == "TFBS Models":
         # third column: performance bar plot
         with col3:
             st.markdown("**Performance Metrics**")
-            st.metric("**Performance Metrics** for", f"{tfbs_model}")
             barplot_fig = plot_tfbs_performance_bars(model_summary)
             st.plotly_chart(barplot_fig, use_container_width=True)
         
-        with st.expander("Show Model Performance Radar Chart"):
-            radar_fig = plot_tfbs_performance_radar(model_summary)
-            st.plotly_chart(radar_fig, use_container_width=True)
-        st.divider()
+        
 
     st.markdown(f"Displaying **{len(df_filtered)}** variants for the **{tfbs_model}** model.")
 

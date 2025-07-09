@@ -80,22 +80,9 @@ def plot_tfbs_performance_bars(model_metrics):
                    'F1-score', 'MCC' (values can be 0–1 or 0–100).
     """
     # 1) Prepare labels + raw values
-    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
+    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC', 'ROC-AUC']
     raw_vals = [model_metrics.get(m, 0) for m in labels]
     
-    # 2) Ensure floats
-    values = [float(v) for v in raw_vals]
-    
-    # 3) Auto‐convert percentages → fractions
-    if max(values, default=0) > 1.0:
-        values = [v / 100.0 for v in values]
-    
-    # 4) Compute dynamic y‐range (10% padding), clamp to [0,1]
-    if values:
-        lo = max(0.0, min(values) * 0.90)
-        hi = min(1.0, max(values) * 1.10)
-    else:
-        lo, hi = 0.0, 1.0
     
     # 5) Build the bar chart
     colors = px.colors.qualitative.Set2[: len(labels)]
@@ -111,7 +98,7 @@ def plot_tfbs_performance_bars(model_metrics):
         font=dict(size=20)
     )
     fig.update_xaxes(title_text="Metric")
-    fig.update_yaxes(title_text="Value", range=[lo, hi])
+    fig.update_yaxes(title_text="Value", range=[70, 100])
     
     return fig
 

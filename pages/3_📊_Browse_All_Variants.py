@@ -143,7 +143,7 @@ elif analysis_type == "TFBS Models":
     st.header("TFBS Variant Analysis")
 
     # --- Filter Controls ---
-    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", df_variants['TFBS'].unique())
+    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_variants['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
 
     # --- TFBS Dashboard Section ---

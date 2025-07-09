@@ -152,8 +152,40 @@ elif analysis_type == "TFBS Models":
 
         # second column: JASPAR info
         with col2:
-            st.metric("Identical Matches Found", f"{int(model_summary.get('identical_match_count', 0))}")
-            st.metric("Best Overall Match ID", model_summary.get('BestMatch_JASPAR_ID', 'N/A'))
+            # show the TFBS name that was matched in JASPAR
+            st.metric(
+                "Target TFBS (JASPAR)",
+                model_summary.get("TargetTFBS_JASPAR", "N/A")
+            )
+            # was it an identical or best‐overall type of match?
+            st.metric(
+                "JASPAR Match Type",
+                model_summary.get("JASPAR_Match_Type", "N/A")
+            )
+            # best match ID + its q-value
+            st.metric(
+                "Best Overall Match ID",
+                model_summary.get("BestMatch_JASPAR_ID", "N/A")
+            )
+            st.metric(
+                "Best Match q-value",
+                f"{model_summary.get('BestMatch_q_value', 0):.2e}"
+            )
+            # identical match ID + its q-value
+            st.metric(
+                "Identical Match ID",
+                model_summary.get("IdenticalMatch_JASPAR_ID", "N/A")
+            )
+            st.metric(
+                "Identical Match q-value",
+                f"{model_summary.get('IdenticalMatch_q_value', 0):.2e}"
+            )
+            # how many identical matches were found
+            st.metric(
+                "Identical Matches Found",
+                f"{int(model_summary.get('identical_match_count', 0))}"
+            )
+
 
         # third column: performance bar plot
         with col3:

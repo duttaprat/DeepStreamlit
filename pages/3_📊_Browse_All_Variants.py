@@ -147,7 +147,7 @@ elif analysis_type == "TFBS Models":
         # third column: performance bar plot
         with col3:
             st.markdown("**Performance Metrics**")
-            st.metric("**Performance Metrics**")
+            st.metric(f"**Performance Metrics** for {tfbs_model}")
             barplot_fig = plot_tfbs_performance_bars(model_summary)
             st.plotly_chart(barplot_fig, use_container_width=True)
         

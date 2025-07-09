@@ -91,8 +91,10 @@ def plot_tfbs_performance_bars(model_metrics):
         title="Model Performance Metrics",
         xaxis_title="Metric",
         yaxis_title="Value",
-        yaxis=dict(range=[0.7, 1]),
-        dtick=0.05,
+        yaxis=dict(
+            range=[0.7, 1.0],
+            dtick=0.05
+        ),
         font=dict(size=20)
     )
 

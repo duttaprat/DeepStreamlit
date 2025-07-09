@@ -104,7 +104,7 @@ def plot_tfbs_performance_bars(model_metrics):
         font=dict(size=20)
     )
     fig.update_xaxes(title_text="Metric")
-    fig.update_yaxes(title_text="Score(%)", range=[lo, hi])
+    fig.update_yaxes(title_text="Score(%)", range=[lo, 100])
     
     return fig
 

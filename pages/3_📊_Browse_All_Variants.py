@@ -74,7 +74,7 @@ def plot_tfbs_performance_bars(model_metrics):
     # same labels/values as before
     labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
     values = [model_metrics.get(metric, 0) for metric in labels]
-
+    st.write(values)
     # grab a pastel palette
     colors = px.colors.qualitative.Set2[:len(labels)]
 

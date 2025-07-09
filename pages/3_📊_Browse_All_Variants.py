@@ -44,7 +44,7 @@ def load_data(cancer, analysis, source):
         df_tfbs_summary = None
         if analysis == "TFBS Models":
             try:
-                df_tfbs_summary = pd.read_csv("data/300bp_TFBS_accuracy_Stat.csv", sep=",")
+                df_tfbs_summary = pd.read_csv("data/df_summary.tsv", sep="\t")
             except FileNotFoundError:
                 st.warning("`TFBS_model_summary.tsv` not found. TFBS dashboard will not be available.")
 
@@ -152,8 +152,8 @@ elif analysis_type == "TFBS Models":
 
         # second column: JASPAR info
         with col2:
-            st.metric("JASPAR Match Type", model_summary.get('JASPAR_Match_Type', 'N/A'))
-            st.metric("JASPAR ID", model_summary.get('JASPAR_ID', 'N/A'))
+            st.metric("Identical Matches Found", f"{int(model_summary.get('identical_match_count', 0))}")
+            st.metric("Best Overall Match ID", model_summary.get('BestMatch_JASPAR_ID', 'N/A'))
 
         # third column: performance bar plot
         with col3:

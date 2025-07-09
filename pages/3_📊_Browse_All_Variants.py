@@ -111,7 +111,8 @@ elif analysis_type == "TFBS Models":
 
     # --- TFBS Dashboard Section ---
     if df_tfbs_summary is not None:
-        model_summary = df_tfbs_summary[df_tfbs_summary['TFBS_Model'] == tfbs_model].iloc[0]
+        model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
+        
         
         st.subheader(f"Dashboard for: {tfbs_model}")
         col1, col2, col3 = st.columns(3)

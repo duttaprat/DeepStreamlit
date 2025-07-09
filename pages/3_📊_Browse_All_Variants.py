@@ -70,7 +70,7 @@ def plot_km_curve(group_A, group_B, variant_id, p_value):
     fig.update_layout(title={'text': f"<b>Survival Analysis for Variant: {variant_id}</b><br>Log-Rank Test p-value: {p_value:.4f}", 'y':0.9, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'}, xaxis_title="Time (Days)", yaxis_title="Survival Probability", legend_title="Patient Group", legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95), template="plotly_white")
     return fig
 
-def plot_tfbs_performance_radar(model_metrics):
+def plot_tfbs_performance_bars(model_metrics):
     # same labels/values as before
     labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
     values = [model_metrics.get(metric, 0) for metric in labels]

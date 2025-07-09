@@ -89,13 +89,22 @@ def plot_tfbs_performance_bars(model_metrics):
         marker_color=colors,
         showlegend=False
     ))
+    # 3) Compute dynamic y-axis range with 10% padding
+    if values:
+        min_val, max_val = min(values), max(values)
+        span = max_val - min_val
+        pad = span * 0.1 if span > 0 else max_val * 0.1
+        lo = max(0, min_val - pad)
+        hi = min(100, max_val + pad)
+    else:
+        lo, hi = 0, 100
     
     # 3) Layout tweaks: fixed y-axis from 0 to 100
     fig.update_layout(
         font=dict(size=20)
     )
     fig.update_xaxes(title_text="Metric")
-    fig.update_yaxes(title_text="Score(%)", range=[70, 100])
+    fig.update_yaxes(title_text="Score(%)", range=[lo, hi])
     
     return fig
 

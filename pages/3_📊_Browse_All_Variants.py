@@ -136,7 +136,8 @@ elif analysis_type == "TFBS Models":
     st.header("TFBS Variant Analysis")
 
     # --- Filter Controls ---
-    tfbs_model = st.selectbox("Step 1: Select a TFBS Model to Analyze", sorted(df_variants['TFBS'].unique()))
+    st.markdown("#### Step 1: Select a TFBS Model to Analyze")
+    tfbs_model = st.selectbox("", sorted(df_variants['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
 
     # --- TFBS Dashboard Section ---
@@ -173,7 +174,7 @@ elif analysis_type == "TFBS Models":
 # --- Common UI: AG-Grid and Survival Plot ---
 # ==============================================================================
 st.subheader("Interactive Variant Table")
-st.markdown("### Step 2: Explore Variants in the Table")
+st.markdown("#### Step 2: Explore Variants in the Table")
 
 # Configure AG-Grid
 gb = GridOptionsBuilder.from_dataframe(df_filtered)

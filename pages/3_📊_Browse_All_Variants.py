@@ -30,6 +30,7 @@ def load_data(cancer, analysis, source):
     try:
         df_variants = pd.read_csv(f"{tsv_path}{source}_combined_{analysis_folder}_Variants_frequency_with_gene_information.tsv", sep="\t")
         df_clinical = pd.read_csv(f"{base_path}patient_clinical_updated.tsv", sep='\t')
+        df_dbsnp = pd.read_csv(f"{base_path}{source}_combined_{analysis_folder}_Intersect_withDBSNP.tsv", sep='\t')
         df_clinical = df_clinical.dropna(subset=['manifest_patient_id', 'km_time', 'km_status'])
         
         # Pre-process variants data
@@ -48,11 +49,11 @@ def load_data(cancer, analysis, source):
             except FileNotFoundError:
                 st.warning("`TFBS_model_summary.tsv` not found. TFBS dashboard will not be available.")
 
-        return df_variants, df_clinical, df_tfbs_summary
+        return df_variants, df_clinical, df_tfbs_summary, df_dbsnp
         
     except FileNotFoundError as e:
         st.error(f"❌ Data file not found. Please check your repository. Details: {e}")
-        return None, None, None
+        return None, None, None, None
 
 # --- Plotting Functions ---
 def plot_km_curve(group_A, group_B, variant_id, p_value):
@@ -112,7 +113,7 @@ def plot_tfbs_performance_bars(model_metrics):
 # --- Main Page Logic ---
 st.title("📊 Browse and Analyze Variants")
 
-df_variants, df_clinical, df_tfbs_summary = load_data(cancer_type, analysis_type, data_source)
+df_variants, df_clinical, df_tfbs_summary, df_dbsnp = load_data(cancer_type, analysis_type, data_source)
 
 if df_variants is None:
     st.stop()
@@ -139,6 +140,7 @@ elif analysis_type == "TFBS Models":
     st.markdown("#### Step 1: Select a TFBS Model to Analyze")
     tfbs_model = st.selectbox("", sorted(df_variants['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
+    df_dbsnp_filtered = df_dbsnp[df_dbsnp['TFBS'] == tfbs_model]
 
     # --- TFBS Dashboard Section ---
     if df_tfbs_summary is not None:
@@ -156,7 +158,9 @@ elif analysis_type == "TFBS Models":
         with col2:
             st.markdown("**Variant Summary**")
             total = len(df_filtered)
-            st.metric("Total Candidate Variants Present atleast 10% of the Patients", f"{total}")
+            st.metric("Candidate Variants (>10% Patients)", f"{total}")
+            unique_rsids = df_dbsnp_filtered['rsID'].nunique()
+            st.metric("Associated Unique dbSNP IDs(rsIDs)", f"{unique_rsids}")
             
         # third column: performance bar plot
         with col3:

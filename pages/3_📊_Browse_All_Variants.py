@@ -136,7 +136,7 @@ elif analysis_type == "TFBS Models":
     st.header("TFBS Variant Analysis")
 
     # --- Filter Controls ---
-    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_variants['TFBS'].unique()))
+    tfbs_model = st.selectbox("Step 1: Select a TFBS Model to Analyze", sorted(df_variants['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
 
     # --- TFBS Dashboard Section ---
@@ -144,28 +144,26 @@ elif analysis_type == "TFBS Models":
         model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
         
         st.subheader(f"Dashboard for: {tfbs_model}")
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2, col3 = st.columns([2, 1, 1])
         # first column: overall counts
         with col1:
-            total = len(df_filtered)
-            st.metric("Total Variants Found", f"{total}")
+            st.markdown("**Model Performance**")
+            barplot_fig = plot_tfbs_performance_bars(model_summary)
+            st.plotly_chart(barplot_fig, use_container_width=True)
 
         # second column: JASPAR info
         with col2:
+            st.markdown("**Variant Summary**")
+            total = len(df_filtered)
+            st.metric("Total Candidate Variants Present atleast 10% of the Patients", f"{total}")
+            
+        # third column: performance bar plot
+        with col3:
+            st.markdown("**Motif Matches in JASPAR**")
             st.metric("Identical Matches", f"{int(model_summary.get('identical_match_count', 0))}")
             # identical match ID + its q-value
             st.metric("Best Overall Match ID", model_summary.get("BestMatch_JASPAR_ID", "N/A"), f"q-value: {model_summary.get('BestMatch_q_value', 0):.2e}")
             st.metric("Best Identical Match ID", model_summary.get("IdenticalMatch_JASPAR_ID", "N/A"), f"q-value: {model_summary.get('IdenticalMatch_q_value', 0):.2e}")
-            
-            # how many identical matches were found
-            
-
-
-        # third column: performance bar plot
-        with col3:
-            st.markdown("**Performance Metrics**")
-            barplot_fig = plot_tfbs_performance_bars(model_summary)
-            st.plotly_chart(barplot_fig, use_container_width=True)
         
         
 
@@ -175,6 +173,7 @@ elif analysis_type == "TFBS Models":
 # --- Common UI: AG-Grid and Survival Plot ---
 # ==============================================================================
 st.subheader("Interactive Variant Table")
+st.markdown("### Step 2: Explore Variants in the Table")
 
 # Configure AG-Grid
 gb = GridOptionsBuilder.from_dataframe(df_filtered)
@@ -198,7 +197,7 @@ selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 # --- Survival Plot and Motif Analysis Section ---
 if not selected_rows_df.empty:
     st.divider()
-    st.header("Detailed Analysis for Selected Variant")
+    st.header("Step 3: Detailed Analysis for Selected Variant")
     
     selected_variant_info = selected_rows_df.iloc[0]
     variant_id = selected_variant_info.get('variant_information', 'Unknown Variant')

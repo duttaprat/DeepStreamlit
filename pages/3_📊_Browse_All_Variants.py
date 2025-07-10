@@ -30,7 +30,7 @@ def load_data(cancer, analysis, source):
     try:
         df_variants = pd.read_csv(f"{tsv_path}{source}_combined_{analysis_folder}_Variants_frequency_with_gene_information.tsv", sep="\t")
         df_clinical = pd.read_csv(f"{base_path}patient_clinical_updated.tsv", sep='\t')
-        df_dbsnp = pd.read_csv(f"{base_path}{source}_combined_{analysis_folder}_Intersect_withDBSNP.tsv", sep='\t')
+        df_dbsnp = pd.read_csv(f"{tsv_path}{source}_combined_{analysis_folder}_Intersect_withDBSNP.tsv", sep='\t')
         df_clinical = df_clinical.dropna(subset=['manifest_patient_id', 'km_time', 'km_status'])
         
         # Pre-process variants data

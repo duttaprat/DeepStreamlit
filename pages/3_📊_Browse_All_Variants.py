@@ -252,7 +252,7 @@ if not selected_rows_df.empty:
 
     # --- Quadrant 2 (Top-Right): Visual Explanation ---
     with row1_col2:
-        st.subheader("Attention Heatmap")
+        st.subheader("Attention Heatmap and Motif analysis")
         
         
         relative_path = selected_variant_info.get('S3_path') # Use the column name 'S3_path'
@@ -313,4 +313,88 @@ if not selected_rows_df.empty:
         else:
             st.info("No known JASPAR motif was found to be directly disrupted by this variant.")
 
+
+if not selected_rows_df.empty:
+    st.divider()
+    st.header("🔍 Detailed Analysis for Selected Variant")
+
+    sv = selected_rows_df.iloc[0]
+    variant_id = sv['variant_information']
+    rsid       = sv.get('rsID', None)
+    pval       = sv.get('p_value', None)
+    hr         = sv.get('HR', None)
+    probs_ref  = sv['Ref_probab']
+    probs_alt  = sv['Alt_probab']
+    motifs     = sv.get('Associated_motifs', [])
+    patient_ids_str = sv.get('GBM_patient_ids', '')
+
+    # first row: 2 columns
+    r1c1, r1c2 = st.columns(2, gap="large")
+    # second row: 2 columns
+    r2c1, r2c2 = st.columns(2, gap="large")
+
+    # ──────────────────────────────────────────────────────────────────────
+    # 1) dbSNP + ClinVar link + clinical significance
+    with r1c1:
+        st.subheader("dbSNP & ClinVar")
+        if rsid:
+            snp_url = f"https://www.ncbi.nlm.nih.gov/snp/{rsid}"
+            clin_url = snp_url + "#clinical_significance"
+            st.markdown(f"- **rsID:** [{rsid}]({snp_url})")
+            st.markdown(f"- [View clinical significance]({clin_url})")
+            # You could optionally scrape or load ClinVar via requests here
+            st.markdown("> *ClinVar*: Not reported")
+        else:
+            st.info("No dbSNP mapping available.")
+
+    # 2) Kaplan–Meier
+    with r1c2:
+        st.subheader("Survival Analysis")
+        if pval is not None and hr is not None:
+            # format p-value in scientific notation: e.g. 1.2e-03
+            p_sci = f"{pval:.2e}"
+            st.write(f"**p-value:** {p_sci}  **HR:** {hr:.2f}")
+            # regenerate the plot
+            mutated = [pid.split("_")[0] for pid in patient_ids_str.split(",") if pid]
+            df_clinical['group'] = df_clinical['manifest_patient_id'].apply(
+                lambda x: 'Mutated' if x in mutated else 'Wild-Type'
+            )
+            gA = df_clinical[df_clinical['group']=="Wild-Type"]
+            gB = df_clinical[df_clinical['group']=="Mutated"]
+            fig = plot_km_curve(gA, gB, variant_id, pval)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning("Survival data unavailable for this variant.")
+
+    # ──────────────────────────────────────────────────────────────────────
+    # 3) Variant & motif summary
+    with r2c1:
+        st.subheader("Variant & Motifs")
+        # Variant string
+        st.markdown(f"**Variant:** `{variant_id}`")
+        # Probabilities
+        st.markdown(f"- **Wild-Type Prob:** {probs_ref:.3f}  **Mutant Prob:** {probs_alt:.3f}")
+        # Motif list or fallback
+        if motifs:
+            motif_md = []
+            for m in motifs:
+                # if you know a JASPAR permalink, embed it:
+                jaspar_url = f"https://jaspar.genereg.net/matrix/{m}/"
+                motif_md.append(f"[{m}]({jaspar_url})")
+            st.markdown("- **Associated motifs:** " + ", ".join(motif_md))
+            st.markdown("> *In the heatmap below,* motifs are outlined in **orange dashed**.")
+        else:
+            st.markdown("- **Associated motifs:** None found")
+
+    # 4) Attention heatmap
+    with r2c2:
+        st.subheader("Attention Heatmap")
+        img_path = sv.get('S3_path')
+        if img_path:
+            full_url = S3_BASE_URL + img_path
+            st.image(full_url,
+                     caption="Attention heatmap ±10 bp around variant",
+                     use_column_width=True)
+        else:
+            st.info("No attention map available.")
 

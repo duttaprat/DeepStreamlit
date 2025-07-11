@@ -44,7 +44,7 @@ def load_data(cancer, analysis, source):
             df_variants = pd.read_csv(master_file_path, sep="\t", low_memory=False)
             
             try:
-                df_tfbs_summary = pd.read_csv("data/TFBS_model_summary_final.tsv", sep="\t")
+                df_tfbs_summary = pd.read_csv("data/300bp_TFBS_accuracy_Stat.csv", sep=",")
             except FileNotFoundError:
                 st.warning("`TFBS_model_summary_final.tsv` not found. TFBS dashboard will not be available.")
 

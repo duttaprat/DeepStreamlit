@@ -155,8 +155,8 @@ elif analysis_type == "TFBS Models":
         
     tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_tfbs_summary['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
-    st.DataFrame(df_variants)
-    st.DataFrame(df_filtered)
+    st.dataframe(df_variants)
+    st.dataframe(df_filtered)
     model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
     
     st.subheader(f"Dashboard for: {tfbs_model}")

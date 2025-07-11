@@ -213,35 +213,101 @@ selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 if not selected_rows_df.empty:
     st.divider()
     st.header("Detailed Analysis for Selected Variant")
+    
+    # Get all the information for the selected variant from the first row of the DataFrame
     selected_variant_info = selected_rows_df.iloc[0]
-    variant_id = selected_variant_info.get('variant_information', 'Unknown Variant')
-    patient_ids_str = selected_variant_info.get('GBM_patient_ids', '')
+    variant_id = selected_variant_info.get('variant_information', 'N/A')
+    
+    # --- Create the 2x2 Grid Layout ---
+    row1_col1, row1_col2 = st.columns(2, gap="large")
+    st.markdown("<hr>", unsafe_allow_html=True) # Visual separator
+    row2_col1, row2_col2 = st.columns(2, gap="large")
 
-    col_km, col_motif = st.columns(2, gap="large")
+    # --- Quadrant 1 (Top-Left): Clinical Impact ---
+    with row1_col1:
+        st.subheader("Survival Analysis")
+        
+        patient_ids_str = selected_variant_info.get('GBM_patient_ids', '')
+        p_value = selected_variant_info.get('p_value')
+        hr_value = selected_variant_info.get('HR')
 
-    with col_km:
-        st.subheader("Kaplan-Meier Survival Plot")
-        if 'p_value' in selected_variant_info and pd.notna(selected_variant_info.get('p_value')):
+        # Check if survival data is available
+        if pd.notna(p_value) and patient_ids_str:
             mutated_patient_ids = [pid.strip().split('_')[0] for pid in patient_ids_str.split(',')]
             df_clinical['group'] = df_clinical['manifest_patient_id'].apply(lambda x: 'Mutated' if x in mutated_patient_ids else 'Wild-Type')
             group_A = df_clinical[df_clinical['group'] == 'Wild-Type']
             group_B = df_clinical[df_clinical['group'] == 'Mutated']
-            km_fig = plot_km_curve(group_A, group_B, variant_id, selected_variant_info['p_value'])
+            
+            km_fig = plot_km_curve(group_A, group_B, variant_id, p_value)
             st.plotly_chart(km_fig, use_container_width=True)
-        else:
-            st.warning("Survival analysis data is not available for this specific variant.")
 
-    with col_motif:
-        if analysis_type == "TFBS Models":
-            st.subheader("Motif Disruption Analysis")
-            st.metric("dbSNP ID", selected_variant_info.get('rsID', 'Not Available'))
-            st.markdown("##### Attention Heatmap")
-            relative_path = selected_variant_info.get('S3_path') # Use the column name 'S3_path'
-            if relative_path and isinstance(relative_path, str):
-                # Construct the full URL
-                full_image_url = S3_BASE_URL + relative_path
-                #st.write(full_image_url)
-                # Use the full URL with st.image
-                st.image(full_image_url, caption="Attention scores over reference and alternative sequences.", use_column_width=True)
-            else:
-                st.info("No attention heatmap available for this variant.")
+            # Display the key statistics below the plot
+            stat_col1, stat_col2 = st.columns(2)
+            stat_col1.metric("Hazard Ratio (HR)", f"{hr_value:.2f}")
+            stat_col2.metric("Log-Rank p-value", f"{p_value:.2e}")
+        else:
+            st.info("Survival analysis data is not available for this variant.")
+
+    # --- Quadrant 2 (Top-Right): Visual Explanation ---
+    with row1_col2:
+        st.subheader("Attention Heatmap")
+        
+        heatmap_path = selected_variant_info.get('S3_path') # Use the column name from your master file
+        
+        if heatmap_path and isinstance(heatmap_path, str):
+            full_image_url = heatmap_path # If you already stored the full URL
+            # Or, if you stored a relative path:
+            # full_image_url = S3_BASE_URL + heatmap_path
+            
+            st.image(full_image_url, use_column_width=True)
+            st.caption("Attention scores for the Wild Type (top) and Mutated (bottom) sequences, shown with a +/- 10bp buffer around the variant.")
+        else:
+            st.info("No attention heatmap available for this variant.")
+
+    # --- Quadrant 3 (Bottom-Left): Quantitative Prediction ---
+    with row2_col1:
+        st.subheader("Model Prediction Scores")
+        
+        st.code(variant_id) # Display the variant ID clearly
+        
+        ref_prob = selected_variant_info.get('Ref_probab', 0)
+        alt_prob = selected_variant_info.get('Alt_probab', 0)
+        disruption_score = selected_variant_info.get('Loss of Function based on LogOddRatio', 0)
+        
+        # Use columns for a cleaner layout of metrics
+        score_col1, score_col2 = st.columns(2)
+        score_col1.metric("Wild Type Probability", f"{ref_prob:.4f}")
+        score_col2.metric(
+            "Mutated Probability", 
+            f"{alt_prob:.4f}",
+            delta=f"{(alt_prob - ref_prob):.4f}",
+            delta_color="inverse"
+        )
+        st.metric("Disruption Score (LogOddRatio)", f"{disruption_score:.4f}")
+
+
+    # --- Quadrant 4 (Bottom-Right): Biological Context ---
+    with row2_col2:
+        st.subheader("Genomic & Motif Context")
+        
+        # dbSNP Information
+        rsID = selected_variant_info.get('rsID')
+        if pd.notna(rsID):
+            ncbi_url = f"https://www.ncbi.nlm.nih.gov/snp/{rsID}"
+            st.markdown(f"**dbSNP ID:** [{rsID}]({ncbi_url})")
+            # You can add the ClinVar link directly
+            st.markdown(f"**Clinical Significance:** [View on NCBI]({ncbi_url}#clinical_significance)")
+        else:
+            st.markdown("**dbSNP ID:** Not Available")
+
+        # Associated Motif Information
+        st.markdown("**Associated Motif:**")
+        associated_motifs = selected_variant_info.get('Associated_motifs')
+        if associated_motifs and isinstance(associated_motifs, str) and associated_motifs.lower() != 'nan':
+            # You can create a link to JASPAR if you have a way to map motif names to JASPAR IDs
+            st.code(associated_motifs)
+            st.caption("This motif is highlighted in the heatmap with a dotted orange line.")
+        else:
+            st.info("No known JASPAR motif was found to be directly disrupted by this variant.")
+
+

@@ -152,11 +152,13 @@ elif analysis_type == "TFBS Models":
     if df_tfbs_summary is None:
         st.error("Could not load TFBS summary data. Please ensure `data/TFBS_model_summary_final.tsv` exists.")
         st.stop()
-        
-    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_tfbs_summary['TFBS'].unique()))
+
+
+    st.markdown("#### Step 1: Select a TFBS Model to Analyze")
+    tfbs_model = st.selectbox("", sorted(df_variants['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
-    st.dataframe(df_variants)
-    st.dataframe(df_filtered)
+    #st.dataframe(df_variants)
+    #st.dataframe(df_filtered)
     model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
     
     st.subheader(f"Dashboard for: {tfbs_model}")

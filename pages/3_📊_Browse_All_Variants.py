@@ -9,7 +9,7 @@ from PIL import Image
 
 # --- Page Configuration ---
 st.set_page_config(layout="wide", page_title="Browse Variants")
-
+S3_BASE_URL = "https://deepvregulome-attention-maps-2025.s3.us-east-2.amazonaws.com/"
 # --- Sidebar Controls ---
 st.sidebar.header("Global Controls")
 cancer_type = st.sidebar.selectbox("Select a Cancer Type:", ("Brain", "Breast", "Lung"), key="cancer_type_browser")
@@ -39,7 +39,7 @@ def load_data(cancer, analysis, source):
         
         if analysis == "TFBS Models":
             # --- TFBS: Load the pre-processed master file ---
-            master_file_path = f"{tsv_path}{source}_master_variants.tsv"
+            master_file_path = f"{tsv_path}{source}_master_attention_motif.tsv"
             print(f"Loading TFBS master file: {master_file_path}")
             df_variants = pd.read_csv(master_file_path, sep="\t", low_memory=False)
             
@@ -236,8 +236,12 @@ if not selected_rows_df.empty:
             st.subheader("Motif Disruption Analysis")
             st.metric("dbSNP ID", selected_variant_info.get('rsID', 'Not Available'))
             st.markdown("##### Attention Heatmap")
-            heatmap_path = selected_variant_info.get('Attention_Heatmap_URL')
-            if heatmap_path and isinstance(heatmap_path, str):
-                st.image(heatmap_path, caption="Attention scores over reference and alternative sequences.", use_column_width=True)
+            relative_path = selected_variant_info.get('S3_path') # Use the column name 'S3_path'
+            if relative_path and isinstance(relative_path, str):
+                # Construct the full URL
+                full_image_url = S3_BASE_URL + relative_path
+
+                # Use the full URL with st.image
+                st.image(full_image_url, caption="Attention scores over reference and alternative sequences.", use_column_width=True)
             else:
                 st.info("No attention heatmap available for this variant.")

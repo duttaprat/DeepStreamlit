@@ -185,16 +185,29 @@ elif analysis_type == "TFBS Models":
     st.divider()
 
 st.markdown(f"Displaying **{len(df_filtered)}** variants for the selected filter.")
-st.subheader("Interactive Variant Table")
-
+# ==============================================================================
 # --- Common UI: AG-Grid and Survival Plot ---
+# ==============================================================================
+st.subheader("Interactive Variant Table")
+st.markdown("#### Step 2: Explore Variants in the Table")
+
+# Configure AG-Grid
 gb = GridOptionsBuilder.from_dataframe(df_filtered)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=15)
 gb.configure_selection('single', use_checkbox=True, suppressRowDeselection=False)
+gb.configure_side_bar()
 grid_options = gb.build()
-columns_to_hide = ['variant_id', 'GBM_patient_ids', 'chromosome', 'variant_start_position', 'variant_end_position', 'ref_nucleotide', 'alternative_nucleotide']
-grid_options['columnDefs'] = [col for col in grid_options['columnDefs'] if col['field'] not in columns_to_hide]
-grid_response = AgGrid(df_filtered, gridOptions=grid_options, update_mode=GridUpdateMode.SELECTION_CHANGED, height=600, width='100%', allow_unsafe_jscode=True)
+
+# Hide non-essential columns
+columns_to_hide = ['GBM_patient_ids', 'chromosome', 'variant_start_position', 'variant_end_position', 'ref_nucleotide', 'alternative_nucleotide']
+column_defs = grid_options['columnDefs']
+grid_options['columnDefs'] = [col for col in column_defs if col['field'] not in columns_to_hide]
+
+grid_response = AgGrid(
+    df_filtered, gridOptions=grid_options, update_mode=GridUpdateMode.SELECTION_CHANGED,
+    height=600, width='100%', allow_unsafe_jscode=True,
+)
+
 selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 
 if not selected_rows_df.empty:

@@ -240,7 +240,7 @@ if not selected_rows_df.empty:
             if relative_path and isinstance(relative_path, str):
                 # Construct the full URL
                 full_image_url = S3_BASE_URL + relative_path
-
+                st.write(full_image_url)
                 # Use the full URL with st.image
                 st.image(full_image_url, caption="Attention scores over reference and alternative sequences.", use_column_width=True)
             else:

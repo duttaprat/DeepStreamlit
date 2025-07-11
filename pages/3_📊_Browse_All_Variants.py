@@ -94,10 +94,41 @@ def plot_km_curve(group_A, group_B, variant_id, p_value):
     return fig
 
 def plot_tfbs_performance_bars(model_metrics):
-    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC']
-    values = [model_metrics.get(metric, 0) for metric in labels]
-    fig = go.Figure(go.Bar(x=values, y=labels, orientation='h', text=[f"{v:.1%}" for v in values], textposition='auto', marker_color='dodgerblue'))
-    fig.update_layout(xaxis_title="Score", yaxis_title="Metric", xaxis=dict(range=[0, 1]), height=250, margin=dict(l=10, r=10, t=10, b=10))
+    """
+    Plots a pastel Set2 bar chart of TFBS model performance on a 0–100 scale.
+    
+    model_metrics: dict with keys 'Accuracy', 'Precision', 'Recall',
+                   'F1-score', 'MCC' (values between 0 and 100).
+    """
+    # 1) Prepare labels + raw values
+    labels = ['Accuracy', 'Precision', 'Recall', 'F1-score', 'MCC', "ROC-AUC"]
+    values = [float(model_metrics.get(m, 0)) for m in labels]
+    
+    # 2) Build the bar chart
+    colors = px.colors.qualitative.Set2[: len(labels)]
+    fig = go.Figure(go.Bar(
+        x=labels,
+        y=values,
+        marker_color=colors,
+        showlegend=False
+    ))
+    # 3) Compute dynamic y-axis range with 10% padding
+    if values:
+        min_val, max_val = min(values), max(values)
+        span = max_val - min_val
+        pad = span * 0.1 if span > 0 else max_val * 0.1
+        lo = max(0, min_val - pad)
+        hi = min(100, max_val + pad)
+    else:
+        lo, hi = 0, 100
+    
+    # 3) Layout tweaks: fixed y-axis from 0 to 100
+    fig.update_layout(
+        font=dict(size=20)
+    )
+    fig.update_xaxes(title_text="Metric")
+    fig.update_yaxes(title_text="Score(%)", range=[lo, hi])
+    
     return fig
 
 # --- Main Page Logic ---
@@ -122,9 +153,9 @@ elif analysis_type == "TFBS Models":
         st.error("Could not load TFBS summary data. Please ensure `data/TFBS_model_summary_final.tsv` exists.")
         st.stop()
         
-    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_tfbs_summary['TFBS_Model'].unique()))
+    tfbs_model = st.selectbox("Select a TFBS Model to Analyze:", sorted(df_tfbs_summary['TFBS'].unique()))
     df_filtered = df_variants[df_variants['TFBS'] == tfbs_model]
-    model_summary = df_tfbs_summary[df_tfbs_summary['TFBS_Model'] == tfbs_model].iloc[0]
+    model_summary = df_tfbs_summary[df_tfbs_summary['TFBS'] == tfbs_model].iloc[0]
     
     st.subheader(f"Dashboard for: {tfbs_model}")
     col1, col2, col3 = st.columns([2, 1, 2], gap="large")

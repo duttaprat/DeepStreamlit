@@ -210,6 +210,8 @@ grid_response = AgGrid(
 
 selected_rows_df = pd.DataFrame(grid_response['selected_rows'])
 
+
+
 if not selected_rows_df.empty:
     st.divider()
     st.header("Detailed Analysis for Selected Variant")
@@ -252,10 +254,11 @@ if not selected_rows_df.empty:
     with row1_col2:
         st.subheader("Attention Heatmap")
         
-        heatmap_path = selected_variant_info.get('S3_path') # Use the column name from your master file
         
-        if heatmap_path and isinstance(heatmap_path, str):
-            full_image_url = heatmap_path # If you already stored the full URL
+        relative_path = selected_variant_info.get('S3_path') # Use the column name 'S3_path'
+        if relative_path and isinstance(relative_path, str):
+            # Construct the full URL
+            full_image_url = S3_BASE_URL + relative_path
             # Or, if you stored a relative path:
             # full_image_url = S3_BASE_URL + heatmap_path
             
